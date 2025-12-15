@@ -1,11 +1,13 @@
 import { NextResponse } from 'next/server';
 import pool from '@/lib/db';
+import fs from 'fs';
+import path from 'path';
 
 export async function POST() {
   try {
     // First, ensure database is initialized
-    const schemaPath = require('fs').readFileSync(
-      require('path').join(process.cwd(), 'lib', 'schema.sql'),
+    const schemaPath = fs.readFileSync(
+      path.join(process.cwd(), 'lib', 'schema.sql'),
       'utf-8'
     );
     const statements = schemaPath.split(';').filter((stmt: string) => stmt.trim().length > 0);
