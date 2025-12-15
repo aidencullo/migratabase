@@ -49,12 +49,18 @@ DB_NAME=migratabase
 ```
 
 4. Initialize the database:
+   - Start your MySQL server
    - Create the database manually or use the init API endpoint:
    ```bash
    curl -X POST http://localhost:3000/api/init
    ```
 
-5. Run the development server:
+5. Seed the database with Aiden Cullo:
+   ```bash
+   curl -X POST http://localhost:3000/api/seed
+   ```
+
+6. Run the development server:
 ```bash
 bun run dev
 ```
@@ -67,6 +73,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 - `POST /api/migrants` - Create a new migrant
 - `GET /api/migrants/search?q=query` - Search migrants
 - `POST /api/init` - Initialize database schema
+- `POST /api/seed` - Seed database with Aiden Cullo
 
 ## Tech Stack
 
