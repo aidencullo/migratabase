@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 
-const names = ['mike', 'carmen velasquez', 'juan rodriguez', 'maria garcia', 'ahmed hassan'];
+const names = ['aiden cullo', 'mike', 'carmen velasquez', 'juan rodriguez', 'maria garcia', 'ahmed hassan'];
 
 export default function AnimatedText() {
   const [displayText, setDisplayText] = useState('where is mike?');
