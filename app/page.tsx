@@ -168,7 +168,15 @@ export default function Home() {
       </div>
 
       {/* Right side - Spinning Globe */}
-      <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px' }}>
+      <div style={{ 
+        position: 'absolute',
+        right: '-200px',
+        top: '50%',
+        transform: 'translateY(-50%)',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}>
         <SpinningGlobe />
       </div>
     </div>
