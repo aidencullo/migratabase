@@ -1,69 +1,49 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import dynamic from 'next/dynamic';
+
+// Dynamically import Globe to avoid SSR issues
+const Globe = dynamic(() => import('react-globe.gl'), { ssr: false });
 
 export default function SpinningGlobe() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const globeRef = useRef<any>(null);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    canvas.width = 200;
-    canvas.height = 200;
-
-    let rotation = 0;
-    const centerX = canvas.width / 2;
-    const centerY = canvas.height / 2;
-    const radius = 80;
-
-    const drawGlobe = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
-      // Draw globe circle
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-      ctx.strokeStyle = '#0066cc';
-      ctx.lineWidth = 3;
-      ctx.stroke();
-
-      // Draw latitude lines
-      for (let i = -2; i <= 2; i++) {
-        const y = centerY + (i * radius / 3);
-        ctx.beginPath();
-        ctx.arc(centerX, centerY, Math.sqrt(radius * radius - (y - centerY) * (y - centerY)), 0, Math.PI * 2);
-        ctx.strokeStyle = '#0066cc';
-        ctx.lineWidth = 1;
-        ctx.stroke();
-      }
-
-      // Draw longitude lines (rotating)
-      for (let i = 0; i < 8; i++) {
-        const angle = (i * Math.PI * 2 / 8) + rotation;
-        ctx.beginPath();
-        ctx.moveTo(centerX, centerY);
-        ctx.lineTo(
-          centerX + Math.cos(angle) * radius,
-          centerY + Math.sin(angle) * radius
-        );
-        ctx.strokeStyle = '#0066cc';
-        ctx.lineWidth = 1;
-        ctx.stroke();
-      }
-
-      rotation += 0.02;
-      requestAnimationFrame(drawGlobe);
-    };
-
-    drawGlobe();
+    setMounted(true);
   }, []);
 
+  useEffect(() => {
+    if (globeRef.current && mounted) {
+      // Auto-rotate the globe
+      globeRef.current.controls().autoRotate = true;
+      globeRef.current.controls().autoRotateSpeed = 1;
+    }
+  }, [mounted]);
+
+  if (!mounted) {
+    return (
+      <div style={{ width: '300px', height: '300px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <div style={{ width: '200px', height: '200px', borderRadius: '50%', border: '3px solid #0066cc', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ fontSize: '14px', color: '#0066cc' }}>Loading...</div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-      <canvas ref={canvasRef} style={{ display: 'block' }} />
+    <div style={{ width: '300px', height: '300px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+      <Globe
+        ref={globeRef}
+        globeImageUrl="https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
+        backgroundColor="rgba(0,0,0,0)"
+        showAtmosphere={true}
+        atmosphereColor="#0066cc"
+        atmosphereAltitude={0.15}
+        width={300}
+        height={300}
+      />
     </div>
   );
 }
