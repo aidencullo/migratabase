@@ -44,34 +44,38 @@ export default function Home() {
       style={{
         minHeight: '100vh',
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: 'white',
         position: 'relative',
+        padding: '20px',
       }}
     >
-      {/* Spinning Globe */}
-      <div style={{ marginBottom: '100px' }}>
-        <SpinningGlobe />
-      </div>
-
-      {/* Animated Text */}
-      <AnimatedText />
-
-      {/* Search Textbox */}
-      <form
-        onSubmit={handleSearch}
+      {/* Left side - Text and Search */}
+      <div
         style={{
-          position: 'absolute',
-          bottom: results.length > 0 ? '400px' : '100px',
-          width: '100%',
-          maxWidth: '600px',
+          flex: 1,
           display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
           justifyContent: 'center',
-          transition: 'bottom 0.3s ease',
+          maxWidth: '600px',
         }}
       >
+        {/* Animated Text */}
+        <AnimatedText />
+
+        {/* Search Textbox */}
+        <form
+          onSubmit={handleSearch}
+          style={{
+            marginTop: '40px',
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'center',
+          }}
+        >
         <input
           type="text"
           value={searchQuery}
@@ -103,24 +107,22 @@ export default function Home() {
             e.target.style.borderColor = '#ddd';
           }}
         />
-      </form>
+        </form>
 
-      {/* Search Results */}
-      {results.length > 0 && (
-        <div
-          style={{
-            position: 'absolute',
-            bottom: '50px',
-            width: '100%',
-            maxWidth: '800px',
-            maxHeight: '300px',
-            overflowY: 'auto',
-            backgroundColor: 'white',
-            borderRadius: '12px',
-            boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
-            padding: '20px',
-          }}
-        >
+        {/* Search Results */}
+        {results.length > 0 && (
+          <div
+            style={{
+              marginTop: '20px',
+              width: '100%',
+              maxHeight: '300px',
+              overflowY: 'auto',
+              backgroundColor: 'white',
+              borderRadius: '12px',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+              padding: '20px',
+            }}
+          >
           <div style={{ marginBottom: '12px', fontSize: '14px', color: '#666' }}>
             Found {results.length} result{results.length !== 1 ? 's' : ''}
           </div>
@@ -149,21 +151,26 @@ export default function Home() {
               </div>
             </div>
           ))}
-        </div>
-      )}
+          </div>
+        )}
 
-      {isSearching && (
-        <div
-          style={{
-            position: 'absolute',
-            bottom: '350px',
-            fontSize: '14px',
-            color: '#666',
-          }}
-        >
-          Searching...
-        </div>
-      )}
+        {isSearching && (
+          <div
+            style={{
+              marginTop: '20px',
+              fontSize: '14px',
+              color: '#666',
+            }}
+          >
+            Searching...
+          </div>
+        )}
+      </div>
+
+      {/* Right side - Spinning Globe */}
+      <div style={{ flex: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '20px' }}>
+        <SpinningGlobe />
+      </div>
     </div>
   );
 }

@@ -22,10 +22,12 @@ export default function SpinningGlobe() {
     }
   }, [mounted]);
 
+  const globeSize = 500;
+
   if (!mounted) {
     return (
-      <div style={{ width: '300px', height: '300px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-        <div style={{ width: '200px', height: '200px', borderRadius: '50%', border: '3px solid #0066cc', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ width: `${globeSize}px`, height: `${globeSize}px`, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+        <div style={{ width: `${globeSize * 0.7}px`, height: `${globeSize * 0.7}px`, borderRadius: '50%', border: '3px solid #0066cc', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div style={{ fontSize: '14px', color: '#0066cc' }}>Loading...</div>
         </div>
       </div>
@@ -33,7 +35,7 @@ export default function SpinningGlobe() {
   }
 
   return (
-    <div style={{ width: '300px', height: '300px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+    <div style={{ width: `${globeSize}px`, height: `${globeSize}px`, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
       <Globe
         ref={globeRef}
         globeImageUrl="https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
@@ -41,8 +43,8 @@ export default function SpinningGlobe() {
         showAtmosphere={true}
         atmosphereColor="#0066cc"
         atmosphereAltitude={0.15}
-        width={300}
-        height={300}
+        width={globeSize}
+        height={globeSize}
       />
     </div>
   );
