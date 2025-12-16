@@ -19,6 +19,8 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(rows);
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('Search error:', error);
+    const errorMessage = error?.message || error?.toString() || 'Unknown error';
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
