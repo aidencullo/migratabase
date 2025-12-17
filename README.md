@@ -6,7 +6,7 @@ A Next.js application for searching and managing migrant information.
 
 - **Simple, slick UI**: White background with spinning globe icon and centered search box
 - **Animated text**: Shows "where is [name]?" with animated typing/deleting effect
-- **MySQL Database**: Relational database with tables for migrants, names, and relationships
+- **SQLite (in-memory)**: In-memory relational DB with tables for migrants, names, and relationships
 - **Search functionality**: Search migrants by name, country, or other attributes
 
 ## Database Schema
@@ -19,8 +19,7 @@ A Next.js application for searching and managing migrant information.
 
 ### Prerequisites
 
-- Bun (or Node.js)
-- MySQL server running locally
+- Node.js (recommended)
 
 ### Installation
 
@@ -35,27 +34,18 @@ cd migratabase
 bun install
 ```
 
-3. Set up environment variables:
+3. (Optional) Copy env file:
 ```bash
 cp .env.example .env
 ```
 
-Edit `.env` with your MySQL credentials:
-```
-DB_HOST=localhost
-DB_USER=root
-DB_PASSWORD=your_password
-DB_NAME=migratabase
-```
-
 4. Initialize the database:
-   - Start your MySQL server
-   - Create the database manually or use the init API endpoint:
+   - Use the init API endpoint:
    ```bash
    curl -X POST http://localhost:3000/api/init
    ```
 
-5. Seed the database with Aiden Cullo:
+5. Seed the database with sample migrants:
    ```bash
    curl -X POST http://localhost:3000/api/seed
    ```
@@ -80,8 +70,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 - Next.js 14
 - React 18
 - TypeScript
-- MySQL2
-- Bun
+- SQLite (in-memory via `sql.js`)
 
 ## License
 
