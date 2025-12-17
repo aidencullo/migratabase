@@ -18,7 +18,7 @@ export default function SpinningGlobe() {
     if (globeRef.current && mounted) {
       // Auto-rotate the globe
       globeRef.current.controls().autoRotate = true;
-      globeRef.current.controls().autoRotateSpeed = 1;
+      globeRef.current.controls().autoRotateSpeed = 0.6;
     }
   }, [mounted]);
 
@@ -38,11 +38,10 @@ export default function SpinningGlobe() {
     <div style={{ width: `${globeSize}px`, height: `${globeSize}px`, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
       <Globe
         ref={globeRef}
-        globeImageUrl="https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
+        // A non-satellite “topology/contour” style texture (borders/lines)
+        globeImageUrl="https://unpkg.com/three-globe/example/img/earth-topology.png"
         backgroundColor="rgba(0,0,0,0)"
-        showAtmosphere={true}
-        atmosphereColor="#0066cc"
-        atmosphereAltitude={0.15}
+        showAtmosphere={false}
         width={globeSize}
         height={globeSize}
       />
