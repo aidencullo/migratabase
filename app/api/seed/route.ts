@@ -14,27 +14,25 @@ export async function POST() {
     
     for (const statement of statements) {
       if (statement.trim()) {
-        await pool.execute(statement);
+        await pool.query(statement);
       }
     }
 
     // Check if Aiden Cullo already exists
-    const [existing] = await pool.execute(
-      'SELECT id FROM migrants WHERE name = ?',
-      ['Aiden Cullo']
-    ) as any[];
+    const existing = await pool.query('SELECT id FROM migrants WHERE name = $1', ['Aiden Cullo']);
 
-    if (existing.length > 0) {
+    if (existing.rows.length > 0) {
       return NextResponse.json({ 
         message: 'Aiden Cullo already exists in the database',
-        migrantId: existing[0].id 
+        migrantId: existing.rows[0].id 
       });
     }
 
     // Insert Aiden Cullo
-    const [result] = await pool.execute(
+    const inserted = await pool.query(
       `INSERT INTO migrants (name, country_of_origin, date_of_birth, age, current_location, status) 
-       VALUES (?, ?, ?, ?, ?, ?)`,
+       VALUES ($1, $2, $3, $4, $5, $6)
+       RETURNING id`,
       [
         'Aiden Cullo',
         'United States',
@@ -43,24 +41,24 @@ export async function POST() {
         'New York, NY',
         'Active'
       ]
-    ) as any[];
+    );
 
-    const migrantId = result.insertId;
+    const migrantId = inserted.rows[0].id;
 
     // Add primary name to migrant_names table
-    await pool.execute(
-      'INSERT INTO migrant_names (migrant_id, name, is_primary) VALUES (?, ?, ?)',
+    await pool.query(
+      'INSERT INTO migrant_names (migrant_id, name, is_primary) VALUES ($1, $2, $3)',
       [migrantId, 'Aiden Cullo', true]
     );
 
     // Add alternative name variations
-    await pool.execute(
-      'INSERT INTO migrant_names (migrant_id, name, is_primary) VALUES (?, ?, ?)',
+    await pool.query(
+      'INSERT INTO migrant_names (migrant_id, name, is_primary) VALUES ($1, $2, $3)',
       [migrantId, 'Aiden', false]
     );
 
-    await pool.execute(
-      'INSERT INTO migrant_names (migrant_id, name, is_primary) VALUES (?, ?, ?)',
+    await pool.query(
+      'INSERT INTO migrant_names (migrant_id, name, is_primary) VALUES ($1, $2, $3)',
       [migrantId, 'Cullo', false]
     );
 

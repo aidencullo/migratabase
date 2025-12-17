@@ -10,14 +10,14 @@ export async function GET(request: NextRequest) {
       return NextResponse.json([]);
     }
 
-    const [rows] = await pool.execute(
+    const result = await pool.query(
       `SELECT DISTINCT m.* FROM migrants m 
        LEFT JOIN migrant_names mn ON m.id = mn.migrant_id 
-       WHERE m.name LIKE ? OR mn.name LIKE ? OR m.country_of_origin LIKE ?`,
-      [`%${query}%`, `%${query}%`, `%${query}%`]
+       WHERE m.name ILIKE $1 OR mn.name ILIKE $1 OR m.country_of_origin ILIKE $1`,
+      [`%${query}%`]
     );
 
-    return NextResponse.json(rows);
+    return NextResponse.json(result.rows);
   } catch (error: any) {
     console.error('Search error:', error);
     const errorMessage = error?.message || error?.toString() || 'Unknown error';
