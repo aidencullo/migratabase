@@ -34,7 +34,7 @@ export async function POST() {
        VALUES (?, ?, ?, ?, ?, ?)`
     );
     
-    insertMigrant.run(
+    const info = insertMigrant.run(
       'Aiden Cullo',
       'United States',
       '1995-06-15',
@@ -43,7 +43,7 @@ export async function POST() {
       'Active'
     );
 
-    const migrantId = db.lastInsertRowid;
+    const migrantId = info.lastInsertRowid;
 
     // Add primary name to migrant_names table
     const insertName = db.prepare(

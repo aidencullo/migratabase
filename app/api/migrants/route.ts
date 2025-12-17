@@ -3,7 +3,8 @@ import db from '@/lib/db';
 
 export async function GET() {
   try {
-    const result = db.query('SELECT * FROM migrants ORDER BY created_at DESC').all();
+    const stmt = db.prepare('SELECT * FROM migrants ORDER BY created_at DESC');
+    const result = stmt.all();
     return NextResponse.json(result);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
@@ -20,8 +21,8 @@ export async function POST(request: NextRequest) {
        VALUES (?, ?, ?, ?, ?, ?)`
     );
     
-    insertMigrant.run(name, country_of_origin, date_of_birth, age, current_location, status);
-    const migrantId = db.lastInsertRowid;
+    const info = insertMigrant.run(name, country_of_origin, date_of_birth, age, current_location, status);
+    const migrantId = info.lastInsertRowid;
 
     // Also add to migrant_names table
     const insertName = db.prepare(

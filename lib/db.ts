@@ -1,12 +1,16 @@
-import { Database } from 'bun:sqlite';
+import Database from 'better-sqlite3';
+import path from 'path';
 
 declare global {
   // eslint-disable-next-line no-var
-  var __sqliteDb: Database | undefined;
+  var __sqliteDb: Database.Database | undefined;
 }
 
 function getDatabasePath() {
-  return process.env.DATABASE_PATH || './migratabase.db';
+  if (process.env.DATABASE_PATH) {
+    return process.env.DATABASE_PATH;
+  }
+  return path.join(process.cwd(), 'migratabase.db');
 }
 
 const db =
@@ -18,6 +22,6 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 // Enable foreign keys
-db.exec('PRAGMA foreign_keys = ON');
+db.pragma('foreign_keys = ON');
 
 export default db;

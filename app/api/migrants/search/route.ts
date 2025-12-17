@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
     const result = db.prepare(
       `SELECT DISTINCT m.* FROM migrants m 
        LEFT JOIN migrant_names mn ON m.id = mn.migrant_id 
-       WHERE m.name LIKE ? OR mn.name LIKE ? OR m.country_of_origin LIKE ?`
+       WHERE LOWER(m.name) LIKE LOWER(?) OR LOWER(mn.name) LIKE LOWER(?) OR LOWER(m.country_of_origin) LIKE LOWER(?)`
     ).all(searchTerm, searchTerm, searchTerm);
 
     return NextResponse.json(result);
