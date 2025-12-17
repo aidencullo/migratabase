@@ -16,19 +16,46 @@ interface Migrant {
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [country, setCountry] = useState('');
+  const [status, setStatus] = useState('');
+  const [location, setLocation] = useState('');
+  const [ageMin, setAgeMin] = useState('');
+  const [ageMax, setAgeMax] = useState('');
+  const [dobFrom, setDobFrom] = useState('');
+  const [dobTo, setDobTo] = useState('');
   const [results, setResults] = useState<Migrant[]>([]);
   const [isSearching, setIsSearching] = useState(false);
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!searchQuery.trim()) {
+    const hasAnyFilter =
+      Boolean(searchQuery.trim()) ||
+      Boolean(country.trim()) ||
+      Boolean(status.trim()) ||
+      Boolean(location.trim()) ||
+      Boolean(ageMin.trim()) ||
+      Boolean(ageMax.trim()) ||
+      Boolean(dobFrom.trim()) ||
+      Boolean(dobTo.trim());
+
+    if (!hasAnyFilter) {
       setResults([]);
       return;
     }
 
     setIsSearching(true);
     try {
-      const response = await fetch(`/api/migrants/search?q=${encodeURIComponent(searchQuery)}`);
+      const params = new URLSearchParams();
+      if (searchQuery.trim()) params.set('q', searchQuery.trim());
+      if (country.trim()) params.set('country', country.trim());
+      if (status.trim()) params.set('status', status.trim());
+      if (location.trim()) params.set('location', location.trim());
+      if (ageMin.trim()) params.set('ageMin', ageMin.trim());
+      if (ageMax.trim()) params.set('ageMax', ageMax.trim());
+      if (dobFrom.trim()) params.set('dobFrom', dobFrom.trim());
+      if (dobTo.trim()) params.set('dobTo', dobTo.trim());
+
+      const response = await fetch(`/api/migrants/search?${params.toString()}`);
       const data = await response.json();
       setResults(Array.isArray(data) ? data : []);
     } catch (error) {
@@ -81,7 +108,17 @@ export default function Home() {
           value={searchQuery}
           onChange={(e) => {
             setSearchQuery(e.target.value);
-            if (!e.target.value.trim()) {
+            const newQ = e.target.value;
+            const hasAnyFilterNow =
+              Boolean(newQ.trim()) ||
+              Boolean(country.trim()) ||
+              Boolean(status.trim()) ||
+              Boolean(location.trim()) ||
+              Boolean(ageMin.trim()) ||
+              Boolean(ageMax.trim()) ||
+              Boolean(dobFrom.trim()) ||
+              Boolean(dobTo.trim());
+            if (!hasAnyFilterNow) {
               setResults([]);
             }
           }}
@@ -108,6 +145,118 @@ export default function Home() {
           }}
         />
         </form>
+
+        {/* Filters */}
+        <div
+          style={{
+            marginTop: '14px',
+            width: '100%',
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: '10px',
+          }}
+        >
+          <input
+            type="text"
+            value={country}
+            onChange={(e) => setCountry(e.target.value)}
+            placeholder="Country (exact, or comma-separated)"
+            style={{
+              width: '100%',
+              padding: '12px 16px',
+              fontSize: '14px',
+              border: '1px solid #ddd',
+              borderRadius: '10px',
+              outline: 'none',
+            }}
+          />
+          <input
+            type="text"
+            value={status}
+            onChange={(e) => setStatus(e.target.value)}
+            placeholder="Status (exact, or comma-separated)"
+            style={{
+              width: '100%',
+              padding: '12px 16px',
+              fontSize: '14px',
+              border: '1px solid #ddd',
+              borderRadius: '10px',
+              outline: 'none',
+            }}
+          />
+          <input
+            type="text"
+            value={location}
+            onChange={(e) => setLocation(e.target.value)}
+            placeholder="Location (partial match)"
+            style={{
+              width: '100%',
+              padding: '12px 16px',
+              fontSize: '14px',
+              border: '1px solid #ddd',
+              borderRadius: '10px',
+              outline: 'none',
+            }}
+          />
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+            <input
+              type="number"
+              value={ageMin}
+              onChange={(e) => setAgeMin(e.target.value)}
+              placeholder="Age min"
+              style={{
+                width: '100%',
+                padding: '12px 16px',
+                fontSize: '14px',
+                border: '1px solid #ddd',
+                borderRadius: '10px',
+                outline: 'none',
+              }}
+            />
+            <input
+              type="number"
+              value={ageMax}
+              onChange={(e) => setAgeMax(e.target.value)}
+              placeholder="Age max"
+              style={{
+                width: '100%',
+                padding: '12px 16px',
+                fontSize: '14px',
+                border: '1px solid #ddd',
+                borderRadius: '10px',
+                outline: 'none',
+              }}
+            />
+          </div>
+          <input
+            type="date"
+            value={dobFrom}
+            onChange={(e) => setDobFrom(e.target.value)}
+            placeholder="DOB from"
+            style={{
+              width: '100%',
+              padding: '12px 16px',
+              fontSize: '14px',
+              border: '1px solid #ddd',
+              borderRadius: '10px',
+              outline: 'none',
+            }}
+          />
+          <input
+            type="date"
+            value={dobTo}
+            onChange={(e) => setDobTo(e.target.value)}
+            placeholder="DOB to"
+            style={{
+              width: '100%',
+              padding: '12px 16px',
+              fontSize: '14px',
+              border: '1px solid #ddd',
+              borderRadius: '10px',
+              outline: 'none',
+            }}
+          />
+        </div>
 
         {/* Search Results */}
         {results.length > 0 && (
