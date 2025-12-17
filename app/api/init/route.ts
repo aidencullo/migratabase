@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
-import pool from '@/lib/db';
+import db from '@/lib/db';
 
 export async function POST() {
   try {
@@ -13,7 +13,7 @@ export async function POST() {
     
     for (const statement of statements) {
       if (statement.trim()) {
-        await pool.query(statement);
+        db.exec(statement);
       }
     }
 

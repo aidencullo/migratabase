@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import pool from '@/lib/db';
+import db from '@/lib/db';
 
 export async function GET(request: NextRequest) {
   try {
@@ -10,14 +10,14 @@ export async function GET(request: NextRequest) {
       return NextResponse.json([]);
     }
 
-    const result = await pool.query(
+    const searchTerm = `%${query}%`;
+    const result = db.prepare(
       `SELECT DISTINCT m.* FROM migrants m 
        LEFT JOIN migrant_names mn ON m.id = mn.migrant_id 
-       WHERE m.name ILIKE $1 OR mn.name ILIKE $1 OR m.country_of_origin ILIKE $1`,
-      [`%${query}%`]
-    );
+       WHERE m.name LIKE ? OR mn.name LIKE ? OR m.country_of_origin LIKE ?`
+    ).all(searchTerm, searchTerm, searchTerm);
 
-    return NextResponse.json(result.rows);
+    return NextResponse.json(result);
   } catch (error: any) {
     console.error('Search error:', error);
     const errorMessage = error?.message || error?.toString() || 'Unknown error';

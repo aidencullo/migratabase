@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import pool from '@/lib/db';
+import db from '@/lib/db';
 import fs from 'fs';
 import path from 'path';
 
@@ -14,53 +14,46 @@ export async function POST() {
     
     for (const statement of statements) {
       if (statement.trim()) {
-        await pool.query(statement);
+        db.exec(statement);
       }
     }
 
     // Check if Aiden Cullo already exists
-    const existing = await pool.query('SELECT id FROM migrants WHERE name = $1', ['Aiden Cullo']);
+    const existing = db.prepare('SELECT id FROM migrants WHERE name = ?').get('Aiden Cullo') as { id: number } | undefined;
 
-    if (existing.rows.length > 0) {
+    if (existing) {
       return NextResponse.json({ 
         message: 'Aiden Cullo already exists in the database',
-        migrantId: existing.rows[0].id 
+        migrantId: existing.id 
       });
     }
 
     // Insert Aiden Cullo
-    const inserted = await pool.query(
+    const insertMigrant = db.prepare(
       `INSERT INTO migrants (name, country_of_origin, date_of_birth, age, current_location, status) 
-       VALUES ($1, $2, $3, $4, $5, $6)
-       RETURNING id`,
-      [
-        'Aiden Cullo',
-        'United States',
-        '1995-06-15',
-        29,
-        'New York, NY',
-        'Active'
-      ]
+       VALUES (?, ?, ?, ?, ?, ?)`
+    );
+    
+    insertMigrant.run(
+      'Aiden Cullo',
+      'United States',
+      '1995-06-15',
+      29,
+      'New York, NY',
+      'Active'
     );
 
-    const migrantId = inserted.rows[0].id;
+    const migrantId = db.lastInsertRowid;
 
     // Add primary name to migrant_names table
-    await pool.query(
-      'INSERT INTO migrant_names (migrant_id, name, is_primary) VALUES ($1, $2, $3)',
-      [migrantId, 'Aiden Cullo', true]
+    const insertName = db.prepare(
+      'INSERT INTO migrant_names (migrant_id, name, is_primary) VALUES (?, ?, ?)'
     );
+    insertName.run(migrantId, 'Aiden Cullo', 1);
 
     // Add alternative name variations
-    await pool.query(
-      'INSERT INTO migrant_names (migrant_id, name, is_primary) VALUES ($1, $2, $3)',
-      [migrantId, 'Aiden', false]
-    );
-
-    await pool.query(
-      'INSERT INTO migrant_names (migrant_id, name, is_primary) VALUES ($1, $2, $3)',
-      [migrantId, 'Cullo', false]
-    );
+    insertName.run(migrantId, 'Aiden', 0);
+    insertName.run(migrantId, 'Cullo', 0);
 
     return NextResponse.json({ 
       message: 'Aiden Cullo seeded successfully',

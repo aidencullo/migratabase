@@ -1,26 +1,23 @@
-import { Pool } from 'pg';
+import { Database } from 'bun:sqlite';
 
 declare global {
   // eslint-disable-next-line no-var
-  var __pgPool: Pool | undefined;
+  var __sqliteDb: Database | undefined;
 }
 
-function getDatabaseUrl() {
-  return (
-    process.env.DATABASE_URL ||
-    // Reasonable local default for dev if DATABASE_URL isn't set
-    'postgres://postgres:postgres@localhost:5432/migratabase'
-  );
+function getDatabasePath() {
+  return process.env.DATABASE_PATH || './migratabase.db';
 }
 
-const pool =
-  global.__pgPool ??
-  new Pool({
-    connectionString: getDatabaseUrl(),
-  });
+const db =
+  global.__sqliteDb ??
+  new Database(getDatabasePath());
 
 if (process.env.NODE_ENV !== 'production') {
-  global.__pgPool = pool;
+  global.__sqliteDb = db;
 }
 
-export default pool;
+// Enable foreign keys
+db.exec('PRAGMA foreign_keys = ON');
+
+export default db;
