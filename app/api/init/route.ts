@@ -3,6 +3,9 @@ import fs from 'fs';
 import path from 'path';
 import pool from '@/lib/db';
 
+export const runtime = 'nodejs';
+export const dynamic = 'force-dynamic';
+
 export async function POST() {
   try {
     const schemaPath = path.join(process.cwd(), 'lib', 'schema.sql');

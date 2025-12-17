@@ -43,9 +43,15 @@ cp .env.example .env
 Edit `.env` with your MySQL credentials:
 ```
 DB_HOST=localhost
+DB_PORT=3306
 DB_USER=root
 DB_PASSWORD=your_password
 DB_NAME=migratabase
+DB_CONNECTION_LIMIT=10
+DB_SSL=false
+
+# Or use a single URL (common in managed hosts):
+# DATABASE_URL=mysql://user:password@host:3306/migratabase?ssl=true
 ```
 
 4. Initialize the database:
