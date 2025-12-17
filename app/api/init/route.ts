@@ -13,7 +13,7 @@ export async function POST() {
     
     for (const statement of statements) {
       if (statement.trim()) {
-        await pool.execute(statement);
+        await pool.query(statement);
       }
     }
 

@@ -1,13 +1,26 @@
-import mysql from 'mysql2/promise';
+import { Pool } from 'pg';
 
-const pool = mysql.createPool({
-  host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_NAME || 'migratabase',
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
-});
+declare global {
+  // eslint-disable-next-line no-var
+  var __pgPool: Pool | undefined;
+}
+
+function getDatabaseUrl() {
+  return (
+    process.env.DATABASE_URL ||
+    // Reasonable local default for dev if DATABASE_URL isn't set
+    'postgres://postgres:postgres@localhost:5432/migratabase'
+  );
+}
+
+const pool =
+  global.__pgPool ??
+  new Pool({
+    connectionString: getDatabaseUrl(),
+  });
+
+if (process.env.NODE_ENV !== 'production') {
+  global.__pgPool = pool;
+}
 
 export default pool;
