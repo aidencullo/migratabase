@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import SpinningGlobe from './components/SpinningGlobe';
 import AnimatedText from './components/AnimatedText';
 
 interface Migrant {
@@ -52,7 +51,7 @@ export default function Home() {
         padding: '20px',
       }}
     >
-      {/* Left side - Text and Search */}
+      {/* Text and Search */}
       <div
         style={{
           flex: 1,
@@ -167,18 +166,6 @@ export default function Home() {
         )}
       </div>
 
-      {/* Right side - Spinning Globe */}
-      <div style={{ 
-        position: 'absolute',
-        right: '-200px',
-        top: '50%',
-        transform: 'translateY(-50%)',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}>
-        <SpinningGlobe />
-      </div>
     </div>
   );
 }
