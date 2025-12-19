@@ -1,65 +1,52 @@
 import { NextResponse } from 'next/server';
-import db from '@/lib/db';
-import fs from 'fs';
-import path from 'path';
+import prisma from '@/lib/prisma';
+import { initializeDatabase } from '@/lib/initializeDatabase';
+
+export const dynamic = 'force-dynamic';
 
 export async function POST() {
   try {
-    // First, ensure database is initialized
-    const schemaPath = fs.readFileSync(
-      path.join(process.cwd(), 'lib', 'schema.sql'),
-      'utf-8'
-    );
-    const statements = schemaPath.split(';').filter((stmt: string) => stmt.trim().length > 0);
-    
-    for (const statement of statements) {
-      if (statement.trim()) {
-        db.exec(statement);
-      }
-    }
+    await initializeDatabase();
 
     // Check if Aiden Cullo already exists
-    const existing = db.prepare('SELECT id FROM migrants WHERE name = ?').get('Aiden Cullo') as { id: number } | undefined;
+    const existing = await prisma.migrant.findFirst({
+      where: { name: 'Aiden Cullo' },
+      select: { id: true },
+    });
 
     if (existing) {
-      return NextResponse.json({ 
+      return NextResponse.json({
         message: 'Aiden Cullo already exists in the database',
-        migrantId: existing.id 
+        migrantId: existing.id,
       });
     }
 
     // Insert Aiden Cullo
-    const insertMigrant = db.prepare(
-      `INSERT INTO migrants (name, country_of_origin, date_of_birth, age, current_location, status) 
-       VALUES (?, ?, ?, ?, ?, ?)`
-    );
-    
-    const info = insertMigrant.run(
-      'Aiden Cullo',
-      'United States',
-      '1995-06-15',
-      29,
-      'New York, NY',
-      'Active'
-    );
-
-    const migrantId = info.lastInsertRowid;
-
-    // Add primary name to migrant_names table
-    const insertName = db.prepare(
-      'INSERT INTO migrant_names (migrant_id, name, is_primary) VALUES (?, ?, ?)'
-    );
-    insertName.run(migrantId, 'Aiden Cullo', 1);
-
-    // Add alternative name variations
-    insertName.run(migrantId, 'Aiden', 0);
-    insertName.run(migrantId, 'Cullo', 0);
-
-    return NextResponse.json({ 
-      message: 'Aiden Cullo seeded successfully',
-      migrantId 
+    const created = await prisma.migrant.create({
+      data: {
+        name: 'Aiden Cullo',
+        country_of_origin: 'United States',
+        date_of_birth: '1995-06-15',
+        age: 29,
+        current_location: 'New York, NY',
+        status: 'Active',
+        migrant_names: {
+          create: [
+            { name: 'Aiden Cullo', is_primary: true },
+            { name: 'Aiden', is_primary: false },
+            { name: 'Cullo', is_primary: false },
+          ],
+        },
+      },
+      select: { id: true },
     });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+
+    return NextResponse.json({
+      message: 'Aiden Cullo seeded successfully',
+      migrantId: created.id,
+    });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

@@ -84,11 +84,6 @@ export default function Home() {
               setResults([]);
             }
           }}
-          onKeyUp={(e) => {
-            if (e.key === 'Enter') {
-              handleSearch(e as any);
-            }
-          }}
           placeholder="Search for someone..."
           style={{
             width: '100%',

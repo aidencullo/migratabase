@@ -1,37 +1,48 @@
 import { NextRequest, NextResponse } from 'next/server';
-import db from '@/lib/db';
+import prisma from '@/lib/prisma';
+import { initializeDatabase } from '@/lib/initializeDatabase';
+
+export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    const stmt = db.prepare('SELECT * FROM migrants ORDER BY created_at DESC');
-    const result = stmt.all();
+    await initializeDatabase();
+
+    const result = await prisma.migrant.findMany({
+      orderBy: { created_at: 'desc' },
+    });
+
     return NextResponse.json(result);
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
 export async function POST(request: NextRequest) {
   try {
+    await initializeDatabase();
+
     const body = await request.json();
     const { name, country_of_origin, date_of_birth, age, current_location, status } = body;
 
-    const insertMigrant = db.prepare(
-      `INSERT INTO migrants (name, country_of_origin, date_of_birth, age, current_location, status)
-       VALUES (?, ?, ?, ?, ?, ?)`
-    );
-    
-    const info = insertMigrant.run(name, country_of_origin, date_of_birth, age, current_location, status);
-    const migrantId = info.lastInsertRowid;
+    const created = await prisma.migrant.create({
+      data: {
+        name,
+        country_of_origin,
+        date_of_birth,
+        age,
+        current_location,
+        status,
+        migrant_names: {
+          create: [{ name, is_primary: true }],
+        },
+      },
+    });
 
-    // Also add to migrant_names table
-    const insertName = db.prepare(
-      'INSERT INTO migrant_names (migrant_id, name, is_primary) VALUES (?, ?, ?)'
-    );
-    insertName.run(migrantId, name, 1);
-
-    return NextResponse.json({ id: migrantId, ...body }, { status: 201 });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json(created, { status: 201 });
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

@@ -9,8 +9,8 @@ CREATE TABLE IF NOT EXISTS migrants (
   age INTEGER,
   current_location TEXT,
   status TEXT,
-  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE INDEX IF NOT EXISTS idx_migrants_name ON migrants (name);
@@ -22,8 +22,8 @@ CREATE TABLE IF NOT EXISTS migrant_names (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   migrant_id INTEGER NOT NULL REFERENCES migrants(id) ON DELETE CASCADE,
   name TEXT NOT NULL,
-  is_primary INTEGER NOT NULL DEFAULT 1,
-  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+  is_primary BOOLEAN NOT NULL DEFAULT 1,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE INDEX IF NOT EXISTS idx_migrant_names_migrant_id ON migrant_names (migrant_id);
@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS migrant_relationships (
   migrant_id_2 INTEGER NOT NULL REFERENCES migrants(id) ON DELETE CASCADE,
   relationship_type TEXT NOT NULL,
   notes TEXT,
-  created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   UNIQUE(migrant_id_1, migrant_id_2, relationship_type)
 );
 
