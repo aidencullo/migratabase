@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Migrant {
+  id                Int      @id @default(autoincrement())
+  name              String
+  country_of_origin String
+  date_of_birth     String
+  age               Int?
+  current_location  String?
+  status            String?
+  created_at        DateTime @default(now())
+  updated_at        DateTime @default(now())
+
+  migrant_names      MigrantName[]
+  relationships_from MigrantRelationship[] @relation("MigrantRelationshipFrom")
+  relationships_to   MigrantRelationship[] @relation("MigrantRelationshipTo")
+
+  @@index([name])
+  @@index([country_of_origin])
+  @@index([status])
+  @@map("migrants")
+}
+
+model MigrantName {
+  id         Int      @id @default(autoincrement())
+  migrant_id Int
+  name       String
+  is_primary Boolean  @default(true)
+  created_at DateTime @default(now())
+
+  migrant Migrant @relation(fields: [migrant_id], references: [id], onDelete: Cascade)
+
+  @@index([migrant_id])
+  @@index([name])
+  @@map("migrant_names")
+}
+
+model MigrantRelationship {
+  id                Int      @id @default(autoincrement())
+  migrant_id_1       Int
+  migrant_id_2       Int
+  relationship_type  String
+  notes             String?
+  created_at         DateTime @default(now())
+
+  migrant1 Migrant @relation("MigrantRelationshipFrom", fields: [migrant_id_1], references: [id], onDelete: Cascade)
+  migrant2 Migrant @relation("MigrantRelationshipTo", fields: [migrant_id_2], references: [id], onDelete: Cascade)
+
+  @@unique([migrant_id_1, migrant_id_2, relationship_type])
+  @@index([migrant_id_1])
+  @@index([migrant_id_2])
+  @@map("migrant_relationships")
+}
+
